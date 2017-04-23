@@ -54,28 +54,6 @@ int mysh_exit(char **args)
 
 int mysh_launch(char **args)
 {
-  
-//  if (strcmp(args[1], "|") == 0)
-//  {
-//    int pfds[2];
-//    pipe(pfds);
-//    if (!fork())
-//    {
-//        close(1);       /* close normal stdout */
-//        dup(pfds[1]);   /* make stdout same as pfds[1] */
-//        close(pfds[0]); /* we don't need this */
-//        execlp("ls", "ls", NULL);
-//    }
-//    else
-//    {
-//        close(0);       /* close normal stdin */
-//        dup(pfds[0]);   /* make stdin same as pfds[0] */
-//        close(pfds[1]); /* we don't need this */
-//        execlp("grep", "SOMETHING", NULL);
-//    }
-//  }
-  
-  
   pid_t pid, wpid;
   int status;
   pid = fork();
@@ -83,17 +61,17 @@ int mysh_launch(char **args)
   if (pid == 0) 
   {    
     
-   if (strcmp(args[0], "ls") == 0)
+   i  if (strcmp(args[0], "ls") == 0)
     {
-    	execl("/Users/michaelrobertson/Desktop/shell/ls", args[0]);
+    	execvp("/Users/michaelrobertson/Desktop/shell/ls", args);
     }
     else if(strcmp(args[0], "cp") == 0)
     {
-        execl("/Users/michaelrobertson/Desktop/shell/cp", args[0]);
+        execvp("/Users/michaelrobertson/Desktop/shell/cp", args);
     }
     else if(strcmp(args[0], "cat") == 0)
     {
-        execl("/Users/michaelrobertson/Desktop/shell/cat", args[0]);
+        execvp("/Users/michaelrobertson/Desktop/shell/cat", args);
     }
     else
     {
