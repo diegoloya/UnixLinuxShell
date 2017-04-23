@@ -83,9 +83,17 @@ int mysh_launch(char **args)
   if (pid == 0) 
   {    
     
-    if ((strcmp(args[0], "ls") == 0)||(strcmp(args[0], "cp") == 0)||(strcmp(args[0], "cat") == 0))
+   if (strcmp(args[0], "ls") == 0)
     {
-    	execv(args[0], args);
+    	execl("/Users/michaelrobertson/Desktop/shell/ls", args[0]);
+    }
+    else if(strcmp(args[0], "cp") == 0)
+    {
+        execl("/Users/michaelrobertson/Desktop/shell/cp", args[0]);
+    }
+    else if(strcmp(args[0], "cat") == 0)
+    {
+        execl("/Users/michaelrobertson/Desktop/shell/cat", args[0]);
     }
     else
     {
