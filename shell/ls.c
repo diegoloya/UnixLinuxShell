@@ -39,6 +39,13 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
+	 if (strcmp(argv[1], "-l") == 0)
+    	{
+        for (int i = 1; i < argc; i++)
+            argv[i] = argv[i+1];
+    	}
+	
+	
 	unsigned char type;
 	if (S_ISDIR(buf.st_mode)) type = 'd';
 	else if (S_ISREG(buf.st_mode)) type = '-';
