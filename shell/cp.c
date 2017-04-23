@@ -22,6 +22,10 @@ int isdir(const char * path)
         return 0;
 }
 
+
+// copy a file using open,creat,read and write
+// from and to are both absolute path
+// return 1, success; 0, error
 int cpfile(const char * from, const char * to)
 {
     int f1, f2, n;
@@ -62,6 +66,8 @@ int cpfile(const char * from, const char * to)
     return 1;
 }
 
+// get file name or directory name
+// NAME is stored in name
 void getfilename(char * bf, char * name)
 {
     int i, n, j;
@@ -75,7 +81,7 @@ void getfilename(char * bf, char * name)
         name[j] = bf[i];
     name[j] = '\0';
 }
-
+// copy a directory, including the files and sub-directories, into a directory that exists
 void cpdir(const char * from, const char * to)
 {
     char bffrom[BUFSIZ],  bfto[BUFSIZ]; // use to store filepath of the source and destination
@@ -116,28 +122,57 @@ void cpdir(const char * from, const char * to)
             chmod(bfto, old_mode.st_mode); // change mode of bfto
             
             
-            // copy the files and subdir in the dir
-            DIR * pdir;
-            struct dirent * pdirent;
-            
-            pdir = opendir(bffrom);
-            while(1) {
-                pdirent = readdir(pdir) ;
-                if(pdirent == NULL)
-                    break;
-                else{
-                    strcpy(bffrom, from);//key
-                    strcat(bffrom, "/");
-                    strcat(bffrom, pdirent->d_name); // subfile or subdir path
-                    cpdir(bffrom, bfto)  ;   // nested
+            int f2;
+            if( (f2 = creat(bfto, old_mode.st_mode)) == -1){
+                mkdir(to, old_mode.st_mode | O_CREAT); // make dir bfto
+                // copy the files and subdir in the dir
+                DIR * pdir;
+                struct dirent * pdirent;
+                
+                pdir = opendir(bffrom);
+                while(1) {
+                    pdirent = readdir(pdir) ;
+                    if(pdirent == NULL)
+                        break;
+                    else{
+                        strcpy(bffrom, from);//key
+                        strcat(bffrom, "/");
+                        strcat(bffrom, pdirent->d_name); // subfile or subdir path
+                        cpdir(bffrom, to)  ;   // nested
+                    }
                 }
+                closedir(pdir);
+
             }
-            closedir(pdir);
+            else{
+                // copy the files and subdir in the dir
+                DIR * pdir;
+                struct dirent * pdirent;
+                
+                pdir = opendir(bffrom);
+                while(1) {
+                    pdirent = readdir(pdir) ;
+                    if(pdirent == NULL)
+                        break;
+                    else{
+                        strcpy(bffrom, from);//key
+                        strcat(bffrom, "/");
+                        strcat(bffrom, pdirent->d_name); // subfile or subdir path
+                        cpdir(bffrom, bfto)  ;   // nested
+                    }
+                }
+                closedir(pdir);
+
+            }
+            
+            
+
             return ;
         }
         else
             return ;
 }
+
 
 int cpFileFile(const char* from, const char* to){
     char buffer[1024];
@@ -148,7 +183,7 @@ int cpFileFile(const char* from, const char* to){
     
     
     if (files[0] == -1){ /* Check if file opened */
-        printf("Unable to open first file");
+        printf("Unable to open first file or file does not exist\n");
         return -1;
     }
     
@@ -166,8 +201,13 @@ int cpFileFile(const char* from, const char* to){
     return 0;
 }
 
+
+
 int main(int argc, char **argv)
 {
+
+    
+    
     /* Check for insufficient parameters */
     if (argc < 3){
         printf("usage: ./cp sourceFile destinationFile\n       ./cp [-R] sourceDirectory destinationDirectory\n");
@@ -179,6 +219,7 @@ int main(int argc, char **argv)
         return exit;
     }
     
+    
     if (argc==4){
         if (strcmp(argv[1],"-R")==0){              //Recursive flag
             cpdir(argv[2], argv[3]);
@@ -187,5 +228,6 @@ int main(int argc, char **argv)
             printf("usage: ./cp sourceFile destinationFile\n       ./cp [-R] sourceDirectory destinationDirectory\n");
         }
     }
+    
     return 0;
 }
