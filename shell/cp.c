@@ -192,26 +192,45 @@ int main(int argc, char **argv)
     
     
     /* Check for insufficient parameters */
-    if (argc < 3){
+    if (argc < 3 || argc>4){
         printf("usage: ./cp sourceFile destinationFile\n       ./cp [-R] sourceDirectory destinationDirectory\n");
         return -1;
     }
     
     if (argc==3){
-       // int exit = cpFileFile(argv[1],argv[2]);
-        cpfile(argv[1], argv[2]);
-        return 0;
+        char *check = strrchr(argv[1], '.');
+        char *check1 = strrchr(argv[2], '.');
+        if (!(check && !strcmp(check, ".txt"))){
+            printf("usage: ./cp sourceFile.txt destinationFile.txt\n       ./cp [-R] sourceDirectory destinationDirectory\n");
+            return 0;
+        }
+        else if (!(check1 && !strcmp(check1, ".txt"))){
+            printf("usage: ./cp sourceFile.txt destinationFile.txt\n       ./cp [-R] sourceDirectory destinationDirectory\n");
+            return 0;
+        }
+        int exit = cpFileFile(argv[1],argv[2]);
+        return exit;
     }
     
     
     if (argc==4){
-        if (strcmp(argv[1],"-R")==0){              //Recursive flag
+        char *check = strrchr(argv[2], '.');
+        char *check1 = strrchr(argv[3], '.');
+        if (check && !strcmp(check, ".txt")){
+            printf("usage: ./cp sourceFile.txt destinationFile.txt\n       ./cp [-R] sourceDirectory destinationDirectory\n");
+            return 0;
+        }
+        else if (check1 && !strcmp(check1, ".txt")){
+            printf("usage: ./cp sourceFile.txt destinationFile.txt\n       ./cp [-R] sourceDirectory destinationDirectory\n");
+            return 0;
+        }
+        else if (strcmp(argv[1],"-R")==0){              //Recursive flag
             cpdir(argv[2], argv[3]);
         }
-        else{
-            printf("usage: ./cp sourceFile destinationFile\n       ./cp [-R] sourceDirectory destinationDirectory\n");
-        }
+        else
+                printf("usage: ./cp sourceFile destinationFile\n       ./cp [-R] sourceDirectory destinationDirectory\n");
     }
     
     return 0;
 }
+
