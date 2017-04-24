@@ -22,10 +22,7 @@ int isdir(const char * path)
         return 0;
 }
 
-
-// copy a file using open,creat,read and write
-// from and to are both absolute path
-// return 1, success; 0, error
+//copy file using paths
 int cpfile(const char * from, const char * to)
 {
     int f1, f2, n;
@@ -67,7 +64,6 @@ int cpfile(const char * from, const char * to)
 }
 
 // get file name or directory name
-// NAME is stored in name
 void getfilename(char * bf, char * name)
 {
     int i, n, j;
@@ -81,6 +77,7 @@ void getfilename(char * bf, char * name)
         name[j] = bf[i];
     name[j] = '\0';
 }
+
 // copy a directory, including the files and sub-directories, into a directory that exists
 void cpdir(const char * from, const char * to)
 {
@@ -92,8 +89,19 @@ void cpdir(const char * from, const char * to)
     strcpy(bffrom, from);
     strcpy(bfto, to);
     
+    if( access(to, F_OK ) != -1 ) {
+        // file exists
+    } else {
+        // file doesn't exist
+        mkdir(bfto,0777);
+
+        cpdir(bffrom,bfto);
+        return;
+    }
+    
     if(flag == 0) // regular file
     {
+        
         getfilename(bffrom, name);  // get file name
         strcat(bfto, "/");
         strcat(bfto, name);
@@ -103,6 +111,8 @@ void cpdir(const char * from, const char * to)
     else
         if(flag == 1) // directory
         {
+            
+            
             // make the same dir
             getfilename(bffrom, name);  // get dir name                  
             strcat(bfto, "/");          // "dir/"
@@ -121,51 +131,24 @@ void cpdir(const char * from, const char * to)
             mkdir(bfto, old_mode.st_mode | O_CREAT); // make dir bfto
             chmod(bfto, old_mode.st_mode); // change mode of bfto
             
-            
-            int f2;
-            if( (f2 = creat(bfto, old_mode.st_mode)) == -1){
-                mkdir(to, old_mode.st_mode | O_CREAT); // make dir bfto
-                // copy the files and subdir in the dir
-                DIR * pdir;
-                struct dirent * pdirent;
-                
-                pdir = opendir(bffrom);
-                while(1) {
-                    pdirent = readdir(pdir) ;
-                    if(pdirent == NULL)
-                        break;
-                    else{
-                        strcpy(bffrom, from);//key
-                        strcat(bffrom, "/");
-                        strcat(bffrom, pdirent->d_name); // subfile or subdir path
-                        cpdir(bffrom, to)  ;   // nested
-                    }
-                }
-                closedir(pdir);
 
-            }
-            else{
-                // copy the files and subdir in the dir
-                DIR * pdir;
-                struct dirent * pdirent;
+            // copy the files and subdir in the dir
+            DIR * pdir;
+            struct dirent * pdirent;
                 
-                pdir = opendir(bffrom);
-                while(1) {
-                    pdirent = readdir(pdir) ;
-                    if(pdirent == NULL)
-                        break;
-                    else{
-                        strcpy(bffrom, from);//key
-                        strcat(bffrom, "/");
-                        strcat(bffrom, pdirent->d_name); // subfile or subdir path
-                        cpdir(bffrom, bfto)  ;   // nested
-                    }
+            pdir = opendir(bffrom);
+            while(1) {
+                pdirent = readdir(pdir) ;
+                if(pdirent == NULL)
+                    break;
+                else{
+                    strcpy(bffrom, from);//key
+                    strcat(bffrom, "/");
+                    strcat(bffrom, pdirent->d_name); // subfile or subdir path
+                    cpdir(bffrom, bfto)  ;   // nested
                 }
-                closedir(pdir);
-
             }
-            
-            
+            closedir(pdir);
 
             return ;
         }
@@ -173,7 +156,7 @@ void cpdir(const char * from, const char * to)
             return ;
 }
 
-
+//copy a file
 int cpFileFile(const char* from, const char* to){
     char buffer[1024];
     int files[2];
@@ -215,8 +198,9 @@ int main(int argc, char **argv)
     }
     
     if (argc==3){
-        int exit = cpFileFile(argv[1],argv[2]);
-        return exit;
+       // int exit = cpFileFile(argv[1],argv[2]);
+        cpfile(argv[1], argv[2]);
+        return 0;
     }
     
     
